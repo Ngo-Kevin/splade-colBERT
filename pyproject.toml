@@ -11,6 +11,11 @@ transformers = "^4.21.0"
 datasets = "^2.4.0"
 sentencepiece= "^0.1.96"
 omegaconf = "^2.2.3"
+hydra-core = "^1.2.0"
+numba = "^0.56.2"
+h5py = "^3.7.0"
+pytrec-eval-terrier = "^0.5.4"
+tensorboard = "^2.10.0"
 
 
 [build-system]
