@@ -6,10 +6,9 @@ channels:
 dependencies:
   - python=3.9.*
   - pytorch
-  - cudatoolkit=11.6
   - pip
   - poetry=1.1.15
   - jupyterlab
-  - faiss-gpu
+  - faiss-cpu
   - pip:
     - ipywidgets

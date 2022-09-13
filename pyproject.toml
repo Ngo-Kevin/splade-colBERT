@@ -16,6 +16,12 @@ numba = "^0.56.2"
 h5py = "^3.7.0"
 pytrec-eval-terrier = "^0.5.4"
 tensorboard = "^2.10.0"
+ujson = "^5.4.0"
+spacy = "^3.4.1"
+scipy = "^1.9.1"
+bitarray = "^2.6.0"
+GitPython = "^3.1.27"
+ninja = "^1.10.2"
 
 
 [build-system]

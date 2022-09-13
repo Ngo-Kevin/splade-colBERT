@@ -26,15 +26,15 @@ To clone the repo properly run:
 
 2. Set up your environment with the proper python version(3.9) and dependencies.
 
-   2.1 - Create a new environment from the `torch_environment.yml` file:
-   `conda env create -f torch_environment.yml`\
+    2.1 - Create a new environment for the project:
+    - gpu: `conda env create -f torch_environment.yml`
+    - cpu/mac: `conda env create -f torch_environment_cpu.yml`
+    - The default environment name will be `capstone`.
 
-   - The default environment name will be `capstone`.
+    2.2 - Activate the newly created environment:
 
-     2.2 - Activate the newly created environment:
-
-   - For Linux/Macos: `source activate [environment_name]`
-   - For Windows: `activate [environment_name]`
+    - For Linux/Macos: `source activate [environment_name]`
+    - For Windows: `activate [environment_name]`
 
      2.3 - Install dependencies on an already created environment:
      `conda env update --file environment.yml`
@@ -44,3 +44,5 @@ To clone the repo properly run:
 
 4. Install all package dependencies:
    `poetry install`
+
+5. To add a new package: `poetry add [package_name]`
