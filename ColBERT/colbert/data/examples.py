@@ -24,7 +24,7 @@ class Examples:
         nway = self.nway + 1 if self.nway else self.nway
         examples = []
 
-        with open(path) as f:
+        with open(path, encoding='utf-8') as f:
             for line in f:
                 example = ujson.loads(line)[:nway]
                 examples.append(example)

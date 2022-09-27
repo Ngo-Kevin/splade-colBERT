@@ -2,6 +2,7 @@ import os
 import random
 import torch
 import numpy as np
+import platform
 
 ALREADY_INITALIZED = False
 
@@ -24,7 +25,8 @@ def init(rank):
         print(f'nranks = {nranks} \t num_gpus = {num_gpus} \t device={rank % num_gpus}')
 
         torch.cuda.set_device(rank % num_gpus)
-        torch.distributed.init_process_group(backend='nccl', init_method='env://')
+        pytorch_backend = 'gloo' if platform.system() == "Windows" else "nccl"
+        torch.distributed.init_process_group(backend=pytorch_backend, init_method='env://')
 
     return nranks, is_distributed
 
