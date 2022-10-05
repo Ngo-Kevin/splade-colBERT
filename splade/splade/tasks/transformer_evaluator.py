@@ -9,10 +9,10 @@ import numpy as np
 import torch
 from tqdm.auto import tqdm
 
-from ..indexing.inverted_index import IndexDictOfArray
-from ..losses.regularization import L0
-from ..tasks.base.evaluator import Evaluator
-from ..utils.utils import makedir, to_list
+from splade.indexing.inverted_index import IndexDictOfArray
+from splade.losses.regularization import L0
+from splade.tasks.base.evaluator import Evaluator
+from splade.utils.utils import makedir, to_list
 
 
 class SparseIndexing(Evaluator):

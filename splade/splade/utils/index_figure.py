@@ -6,7 +6,7 @@ from omegaconf import DictConfig
 
 import hydra
 from conf.CONFIG_CHOICE import CONFIG_NAME, CONFIG_PATH
-from .utils import get_initialize_config
+from splade.utils import get_initialize_config
 
 
 @hydra.main(config_path=CONFIG_PATH, config_name=CONFIG_NAME, version_base="1.2")

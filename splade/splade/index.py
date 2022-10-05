@@ -2,11 +2,11 @@ import hydra
 from omegaconf import DictConfig
 
 from conf.CONFIG_CHOICE import CONFIG_NAME, CONFIG_PATH
-from .datasets.dataloaders import CollectionDataLoader
-from .datasets.datasets import CollectionDatasetPreLoad
-from .models.models_utils import get_model
-from .tasks.transformer_evaluator import SparseIndexing
-from .utils.utils import get_initialize_config
+from datasets.dataloaders import CollectionDataLoader
+from datasets.datasets import CollectionDatasetPreLoad
+from models.models_utils import get_model
+from tasks.transformer_evaluator import SparseIndexing
+from utils.utils import get_initialize_config
 
 
 @hydra.main(config_path=CONFIG_PATH, config_name=CONFIG_NAME, version_base="1.2")

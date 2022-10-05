@@ -6,10 +6,10 @@ import torch
 from omegaconf import open_dict
 from tqdm.auto import tqdm
 
-from ..tasks import amp
-from ..tasks.base.trainer import TrainerIter
-from ..utils.metrics import init_eval
-from ..utils.utils import parse
+from splade.tasks import amp
+from splade.tasks.base.trainer import TrainerIter
+from splade.utils.metrics import init_eval
+from splade.utils.utils import parse
 
 
 class TransformerTrainer(TrainerIter):

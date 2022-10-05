@@ -6,11 +6,11 @@ import numpy as np
 from omegaconf import DictConfig
 
 from conf.CONFIG_CHOICE import CONFIG_NAME, CONFIG_PATH
-from .datasets.dataloaders import CollectionDataLoader
-from .datasets.datasets import CollectionDatasetPreLoad
-from .models.models_utils import get_model
-from .tasks.transformer_evaluator import SparseIndexing
-from .utils.utils import get_initialize_config
+from datasets.dataloaders import CollectionDataLoader
+from datasets.datasets import CollectionDatasetPreLoad
+from models.models_utils import get_model
+from tasks.transformer_evaluator import SparseIndexing
+from utils.utils import get_initialize_config
 
 
 def estim_act_prob(dist, collection_size, voc_size=30522):

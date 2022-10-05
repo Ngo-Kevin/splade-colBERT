@@ -3,8 +3,8 @@ from abc import ABC
 import torch
 from transformers import AutoTokenizer, AutoModelForMaskedLM, AutoModel
 
-from ..tasks.amp import NullContextManager
-from ..utils.utils import generate_bow, normalize
+from splade.tasks.amp import NullContextManager
+from splade.utils.utils import generate_bow, normalize
 
 """
 we provide abstraction classes from which we can easily derive representation-based models with transformers like SPLADE
