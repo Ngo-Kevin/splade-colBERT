@@ -20,7 +20,7 @@ class ResidualCodec:
 
     def __init__(self, config, centroids, avg_residual=None, bucket_cutoffs=None, bucket_weights=None):
         self.use_gpu = config.total_visible_gpus > 0
-
+        # self.use_gpu = False
         ResidualCodec.try_load_torch_extensions(self.use_gpu)
 
         if self.use_gpu > 0:
