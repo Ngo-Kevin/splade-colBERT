@@ -27,7 +27,6 @@ class CollectionEncoder():
                                                               keep_dims='flatten', showprogress=(not self.use_gpu))
                 embs.append(embs_)
                 doclens.extend(doclens_)
-
             embs = torch.cat(embs)
 
             # embs, doclens = self.checkpoint.docFromText(passages, bsize=self.config.bsize,
