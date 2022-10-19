@@ -20,8 +20,12 @@ class ResidualCodec:
 
     def __init__(self, config, centroids, avg_residual=None, bucket_cutoffs=None, bucket_weights=None):
         self.use_gpu = config.total_visible_gpus > 0
-
-        ResidualCodec.try_load_torch_extensions(self.use_gpu)
+        try:
+            ResidualCodec.try_load_torch_extensions(self.use_gpu)
+        except:
+            # self.use_gpu = False
+            print('failed to load pytorch extensions')
+            self.loaded_extensions = False
 
         if self.use_gpu > 0:
             self.centroids = centroids.cuda().half()
@@ -192,10 +196,10 @@ class ResidualCodec:
         assert self.dim % 8 == 0
         assert self.dim % (self.nbits * 8) == 0, (self.dim, self.nbits)
 
-        if self.use_gpu:
+        if self.use_gpu and self.loaded_extensions:
             residuals_packed = ResidualCodec.packbits(residuals.contiguous().flatten())
         else:
-            residuals_packed = np.packbits(np.asarray(residuals.contiguous().flatten()))
+            residuals_packed = np.packbits(np.asarray(residuals.contiguous().flatten().cpu()))
         residuals_packed = torch.as_tensor(residuals_packed, dtype=torch.uint8)
         residuals_packed = residuals_packed.reshape(residuals.size(0), self.dim // 8 * self.nbits)
 
@@ -246,7 +250,7 @@ class ResidualCodec:
 
         D = []
         for codes_, residuals_ in zip(codes.split(1 << 15), residuals.split(1 << 15)):
-            if self.use_gpu:
+            if self.use_gpu and self.loaded_extensions:
                 codes_, residuals_ = codes_.cuda(), residuals_.cuda()
                 centroids_ = ResidualCodec.decompress_residuals(
                     residuals_,

@@ -80,6 +80,8 @@ class CollectionIndexer():
                 Run().print_main(f"#> num_partitions = {self.num_chunks}")
                 Run().print_main(f"#> num_embeddings_est = {self.num_embeddings_est}")
                 Run().print_main(f"#> avg_doclen_est = {self.avg_doclen_est}")
+                # added for resume
+                Run().print_main(f"#> num_sample_embs = {self.num_sample_embs}")
                 return
 
         self.num_chunks = int(np.ceil(len(self.collection) / self.collection.get_chunksize()))
@@ -92,7 +94,7 @@ class CollectionIndexer():
         self.num_embeddings_est = num_passages * avg_doclen_est
         self.num_partitions = int(2 ** np.floor(np.log2(16 * np.sqrt(self.num_embeddings_est))))
 
-        Run().print_main(f'Creaing {self.num_partitions:,} partitions.')
+        Run().print_main(f'Creating {self.num_partitions:,} partitions.')
         Run().print_main(f'*Estimated* {int(self.num_embeddings_est):,} embeddings.')
 
         self._save_plan()
@@ -123,25 +125,25 @@ class CollectionIndexer():
 
         if torch.cuda.is_available():
             self.num_sample_embs = torch.tensor([local_sample_embs.size(0)]).cuda()
-            torch.distributed.all_reduce(self.num_sample_embs)
+            # torch.distributed.all_reduce(self.num_sample_embs)
 
             avg_doclen_est = sum(doclens) / len(doclens) if doclens else 0
             avg_doclen_est = torch.tensor([avg_doclen_est]).cuda()
-            torch.distributed.all_reduce(avg_doclen_est)
+            # torch.distributed.all_reduce(avg_doclen_est)
 
             nonzero_ranks = torch.tensor([float(len(local_sample) > 0)]).cuda()
-            torch.distributed.all_reduce(nonzero_ranks)
+            # torch.distributed.all_reduce(nonzero_ranks)
         else:
             if torch.distributed.is_initialized():
                 self.num_sample_embs = torch.tensor([local_sample_embs.size(0)]).cpu()
-                torch.distributed.all_reduce(self.num_sample_embs)
+                # torch.distributed.all_reduce(self.num_sample_embs)
 
                 avg_doclen_est = sum(doclens) / len(doclens) if doclens else 0
                 avg_doclen_est = torch.tensor([avg_doclen_est]).cpu()
-                torch.distributed.all_reduce(avg_doclen_est)
+                # torch.distributed.all_reduce(avg_doclen_est)
 
                 nonzero_ranks = torch.tensor([float(len(local_sample) > 0)]).cpu()
-                torch.distributed.all_reduce(nonzero_ranks)
+                # torch.distributed.all_reduce(nonzero_ranks)
             else:
                 self.num_sample_embs = torch.tensor([local_sample_embs.size(0)]).cpu()
 
@@ -154,7 +156,8 @@ class CollectionIndexer():
         self.avg_doclen_est = avg_doclen_est
 
         Run().print(f'avg_doclen_est = {avg_doclen_est} \t len(local_sample) = {len(local_sample):,}')
-
+        Run().print(f'{self.num_sample_embs=}')
+        Run().print(os.path.join(self.config.index_path_, f'sample.{self.rank}.pt'))
         torch.save(local_sample_embs.half(), os.path.join(self.config.index_path_, f'sample.{self.rank}.pt'))
 
         return avg_doclen_est
@@ -179,6 +182,11 @@ class CollectionIndexer():
                 self.num_partitions = plan['num_partitions']
                 self.num_embeddings_est = plan['num_embeddings_est']
                 self.avg_doclen_est = plan['avg_doclen_est']
+                # added for resume
+                if torch.cuda.is_available():
+                    self.num_sample_embs = torch.tensor([plan['num_sample_embs']]).cuda()
+                else:
+                    self.num_sample_embs = torch.tensor([plan['num_sample_embs']]).cpu()
 
             return True
         else:
@@ -196,6 +204,8 @@ class CollectionIndexer():
                 d['num_partitions'] = self.num_partitions
                 d['num_embeddings_est'] = self.num_embeddings_est
                 d['avg_doclen_est'] = self.avg_doclen_est
+                # added for resume
+                d['num_sample_embs'] = self.num_sample_embs.item()
 
                 f.write(ujson.dumps(d, indent=4) + '\n')
 
