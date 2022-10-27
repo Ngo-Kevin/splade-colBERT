@@ -1,4 +1,4 @@
-import tqdm
+from tqdm.auto import tqdm
 import ujson
 
 from collections import defaultdict
@@ -31,11 +31,11 @@ class RankingScorer:
 
         scores_by_qid = defaultdict(list)
 
-        for qid, pid, score in tqdm.tqdm(zip(qids, pids, distillation_scores)):
+        for qid, pid, score in tqdm(zip(qids, pids, distillation_scores)):
             scores_by_qid[qid].append((score, pid))
 
         with Run().open('distillation_scores.json', 'w') as f:
-            for qid in tqdm.tqdm(scores_by_qid):
+            for qid in tqdm(scores_by_qid):
                 obj = (qid, scores_by_qid[qid])
                 f.write(ujson.dumps(obj) + '\n')
 

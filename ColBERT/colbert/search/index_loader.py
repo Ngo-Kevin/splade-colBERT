@@ -2,7 +2,7 @@ import os
 import ujson
 import torch
 import numpy as np
-import tqdm
+from tqdm.auto import tqdm
 
 from colbert.utils.utils import lengths2offsets, print_message, dotdict, flatten
 from colbert.indexing.codecs.residual import ResidualCodec
@@ -49,7 +49,7 @@ class IndexLoader:
 
         print_message("#> Loading doclens...")
 
-        for chunk_idx in tqdm.tqdm(range(self.num_chunks)):
+        for chunk_idx in tqdm(range(self.num_chunks)):
             with open(os.path.join(self.index_path, f'doclens.{chunk_idx}.json')) as f:
                 chunk_doclens = ujson.load(f)
                 doclens.extend(chunk_doclens)

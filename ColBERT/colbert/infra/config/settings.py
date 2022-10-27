@@ -80,6 +80,8 @@ class RunSettings:
 
     @property
     def path_(self):
+        if self.script_name_ is 'none':
+            return os.path.join(self.root, self.experiment, self.name)
         return os.path.join(self.root, self.experiment, self.script_name_, self.name)
 
     @property

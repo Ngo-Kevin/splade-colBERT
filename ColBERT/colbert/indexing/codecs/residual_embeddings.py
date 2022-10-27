@@ -1,7 +1,7 @@
 import os
 import torch
 import ujson
-import tqdm
+from tqdm.auto import tqdm
 
 from colbert.indexing.codecs.residual_embeddings_strided import ResidualEmbeddingsStrided
 from colbert.utils.utils import print_message
@@ -36,7 +36,7 @@ class ResidualEmbeddings:
 
         print_message("#> Loading codes and residuals...")
 
-        for chunk_idx in tqdm.tqdm(chunk_idxs):
+        for chunk_idx in tqdm(chunk_idxs):
             chunk = cls.load(index_path, chunk_idx)
 
             codes_endpos = codes_offset + chunk.codes.size(0)

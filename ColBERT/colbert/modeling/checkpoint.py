@@ -1,6 +1,6 @@
 import torch
 
-from tqdm import tqdm
+from tqdm.auto import tqdm
 
 from colbert.modeling.tokenization import QueryTokenizer, DocTokenizer
 from colbert.utils.amp import MixedPrecisionManager

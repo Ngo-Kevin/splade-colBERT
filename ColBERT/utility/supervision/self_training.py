@@ -1,7 +1,7 @@
 import os
 import sys
 import git
-import tqdm
+from tqdm.auto import tqdm
 import ujson
 import random
 
@@ -58,7 +58,7 @@ def main(args):
     rankings = load_ranking(args.ranking, types=[int, int, int, float, int])
 
     print_message("#> Group by QID")
-    qid2rankings = groupby_first_item(tqdm.tqdm(rankings))
+    qid2rankings = groupby_first_item(tqdm(rankings))
 
     Triples = []
     NonEmptyQIDs = 0

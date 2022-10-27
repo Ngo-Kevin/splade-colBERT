@@ -3,7 +3,7 @@
 """
 
 import os
-import tqdm
+from tqdm.auto import tqdm
 
 from argparse import ArgumentParser
 from collections import defaultdict
@@ -27,7 +27,7 @@ def main(args):
     with open(args.output, 'w') as f:
         print_message(f"#> Writing the output rankings to {args.output} ..")
 
-        for qid in tqdm.tqdm(Rankings):
+        for qid in tqdm(Rankings):
             ranking = sorted(Rankings[qid], reverse=True)
 
             for rank, (score, original_rank, pid) in enumerate(ranking):

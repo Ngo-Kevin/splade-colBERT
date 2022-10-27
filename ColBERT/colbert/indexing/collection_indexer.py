@@ -1,5 +1,5 @@
 import os
-import tqdm
+from tqdm.auto import tqdm
 import time
 import ujson
 import torch
@@ -330,7 +330,7 @@ class CollectionIndexer():
     def index(self):
         with self.saver.thread():
             batches = self.collection.enumerate_batches(rank=self.rank)
-            for chunk_idx, offset, passages in tqdm.tqdm(batches, disable=self.rank > 0):
+            for chunk_idx, offset, passages in tqdm(batches, disable=self.rank > 0):
                 if self.config.resume and self.saver.check_chunk_exists(chunk_idx):
                     Run().print_main(f"#> Found chunk {chunk_idx} in the index already, skipping encoding...")
                     continue
@@ -408,7 +408,7 @@ class CollectionIndexer():
 
         Run().print_main("#> Loading codes...")
 
-        for chunk_idx in tqdm.tqdm(range(self.num_chunks)):
+        for chunk_idx in tqdm(range(self.num_chunks)):
             offset = self.embedding_offsets[chunk_idx]
             chunk_codes = ResidualCodec.Embeddings.load_codes(self.config.index_path_, chunk_idx)
 

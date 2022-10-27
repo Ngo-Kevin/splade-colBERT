@@ -1,6 +1,6 @@
 import os
 import sys
-import tqdm
+from tqdm.auto import tqdm
 import ujson
 import random
 

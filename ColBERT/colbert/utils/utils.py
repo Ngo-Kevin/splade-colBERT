@@ -1,5 +1,5 @@
 import os
-import tqdm
+from tqdm.auto import tqdm
 import torch
 import datetime
 import itertools
@@ -29,7 +29,7 @@ def timestamp(daydir=False):
 def file_tqdm(file):
     print(f"#> Reading {file.name}")
 
-    with tqdm.tqdm(total=os.path.getsize(file.name) / 1024.0 / 1024.0, unit="MiB") as pbar:
+    with tqdm(total=os.path.getsize(file.name) / 1024.0 / 1024.0, unit="MiB") as pbar:
         for line in file:
             yield line
             pbar.update(len(line) / 1024.0 / 1024.0)
@@ -203,7 +203,7 @@ def load_ranking(path, types=None, lazy=False):
 
     try:
         lists = torch.load(path)
-        lists = zipstar([l.tolist() for l in tqdm.tqdm(lists)], lazy=lazy)
+        lists = zipstar([l.tolist() for l in tqdm(lists)], lazy=lazy)
     except:
         if types is None:
             types = itertools.cycle([int_or_float])

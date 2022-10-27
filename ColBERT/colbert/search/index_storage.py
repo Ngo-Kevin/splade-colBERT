@@ -58,6 +58,7 @@ class IndexScorer(IndexLoader, CandidateGeneration):
         cls.decompress_residuals = decompress_residuals_cpp.decompress_residuals_cpp
 
         cls.loaded_extensions = True
+
     def lookup_eids(self, embedding_ids, codes=None, out_device='cuda'):
         return self.embeddings_strided.lookup_eids(embedding_ids, codes=codes, out_device=out_device)
 

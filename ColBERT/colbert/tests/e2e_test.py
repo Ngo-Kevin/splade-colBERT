@@ -3,7 +3,7 @@ import argparse
 from collections import namedtuple
 from datasets import load_dataset
 from utility.utils.dpr import has_answer, DPR_normalize
-import tqdm
+from tqdm.auto import tqdm
 
 from colbert import Indexer, Searcher
 from colbert.infra import ColBERTConfig, RunConfig, Run
@@ -40,7 +40,7 @@ def build_index_and_init_searcher(checkpoint, collection, experiment_dir):
 
 def success_at_k(searcher, examples, k):
     scores = []
-    for ex in tqdm.tqdm(examples):
+    for ex in tqdm(examples):
         scores.append(evaluate_retrieval_example(searcher, ex, k))
     return sum(scores) / len(scores)
 
