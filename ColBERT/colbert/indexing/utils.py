@@ -1,6 +1,6 @@
 import os
 import torch
-import tqdm
+from tqdm.auto import tqdm
 
 from colbert.indexing.loaders import load_doclens
 from colbert.utils.utils import print_message, flatten
@@ -35,7 +35,7 @@ def optimize_ivf(orig_ivf, orig_ivf_lengths, index_path):
     ivf_lengths = []
 
     offset = 0
-    for length in tqdm.tqdm(orig_ivf_lengths.tolist()):
+    for length in tqdm(orig_ivf_lengths.tolist()):
         pids = torch.unique(ivf[offset:offset+length])
         unique_pids_per_centroid.append(pids)
         ivf_lengths.append(pids.shape[0])

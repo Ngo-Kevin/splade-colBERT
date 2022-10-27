@@ -1,5 +1,5 @@
 import os
-import tqdm
+from tqdm.auto import tqdm
 import ujson
 from colbert.infra.provenance import Provenance
 
@@ -40,7 +40,7 @@ class Ranking:
             return data
 
         self.flat_ranking = data
-        return groupby_first_item(tqdm.tqdm(self.flat_ranking))
+        return groupby_first_item(tqdm(self.flat_ranking))
 
     def _load_file(self, path):
         return load_ranking(path)

@@ -1,7 +1,7 @@
 import os
 import torch
 
-from tqdm import tqdm
+from tqdm.auto import tqdm
 from typing import Union
 
 from colbert.data import Collection, Queries, Ranking

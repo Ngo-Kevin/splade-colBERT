@@ -4,7 +4,7 @@
 
 import os
 import math
-import tqdm
+from tqdm.auto import tqdm
 import ujson
 import random
 
@@ -54,7 +54,7 @@ def main(args):
 
     print_message(f"#> Computing MRR@10 for {num_judged_queries} queries.")
 
-    for qid in tqdm.tqdm(qid2positives):
+    for qid in tqdm(qid2positives):
         ranking = qid2ranking[qid]
         positives = qid2positives[qid]
 
@@ -95,7 +95,7 @@ def main(args):
         print_message(f"#> Writing annotations to {args.output} ..")
 
         with open(args.output, 'w') as f:
-            for qid in tqdm.tqdm(qid2positives):
+            for qid in tqdm(qid2positives):
                 ranking = qid2ranking[qid]
                 positives = qid2positives[qid]
 

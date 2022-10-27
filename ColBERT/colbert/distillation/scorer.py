@@ -1,5 +1,5 @@
 import torch
-import tqdm
+from tqdm.auto import tqdm
 
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 
@@ -46,7 +46,7 @@ class Scorer:
         model.eval()
         with torch.inference_mode():
             with torch.cuda.amp.autocast():
-                for offset in tqdm.tqdm(range(0, len(qids), self.bsize), disable=(not show_progress)):
+                for offset in tqdm(range(0, len(qids), self.bsize), disable=(not show_progress)):
                     endpos = offset + self.bsize
 
                     queries_ = [self.queries[qid] for qid in qids[offset:endpos]]

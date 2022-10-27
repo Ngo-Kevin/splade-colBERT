@@ -23,7 +23,6 @@ class ResidualCodec:
         try:
             ResidualCodec.try_load_torch_extensions(self.use_gpu)
         except:
-            # self.use_gpu = False
             print('failed to load pytorch extensions')
             self.loaded_extensions = False
 
@@ -263,8 +262,10 @@ class ResidualCodec:
                     self.nbits,
                 ).cuda()
             else:
-                # TODO: Remove dead code
-                centroids_ = self.lookup_centroids(codes_, out_device='cpu')
+                if self.use_gpu:
+                    centroids_ = self.lookup_centroids(codes_, out_device='cuda')
+                else:
+                    centroids_ = self.lookup_centroids(codes_, out_device='cpu')
                 residuals_ = self.reversed_bit_map[residuals_.long()]
                 residuals_ = self.decompression_lookup_table[residuals_.long()]
                 residuals_ = residuals_.reshape(residuals_.shape[0], -1)

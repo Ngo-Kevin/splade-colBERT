@@ -4,7 +4,7 @@ from colbert.data.collection import Collection
 import os
 import sys
 import git
-import tqdm
+from tqdm.auto import tqdm
 import ujson
 import random
 
