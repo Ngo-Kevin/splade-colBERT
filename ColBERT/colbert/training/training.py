@@ -3,6 +3,8 @@ import torch
 import random
 import torch.nn as nn
 import numpy as np
+import ujson
+import os
 
 from transformers import AdamW, get_linear_schedule_with_warmup
 from colbert.infra import ColBERTConfig
@@ -19,8 +21,36 @@ from colbert.utils.utils import print_message
 from colbert.training.utils import print_progress, manage_checkpoints
 
 
+def filter_layers(name, prune_type, ignore_bias=True):
+    if name.startswith('model.bert.embeddings') \
+        or 'LayerNorm' in name: 
+            return True
+    if ignore_bias and name.endswith('bias'):
+        return True
+    if prune_type == "dense":
+        if "attention" in name:
+            return True
+    elif "attention" in prune_type:
+        if "attention" not in name:
+            return True
+        if "no_dense" in prune_type and "dense" in name:
+            return True
+    return False
 
 def train(config: ColBERTConfig, triples, queries=None, collection=None):
+    
+    ### pruning
+    ###### Gotta do full intergration w/ colBERT?
+    prune_type = 'attention'
+    prune_l1_lambda = 5e-3
+    ###
+
+    ### resume ###
+    # checkpoint = {}
+    # config.set('resume', True)
+    # checkpoint['batch'] = 0
+    # config.checkpoint = r'D:\Documents\Python_Scripts\class\UCB\splade-colBERT\ColBERT\experiments\msmarco_400.000_l1_mean_1e-5\2022-11\24\03.43.22\checkpoints\colbert-80000'
+    ###
     config.checkpoint = config.checkpoint or 'bert-base-uncased'
 
     if config.rank < 1:
@@ -44,6 +74,7 @@ def train(config: ColBERTConfig, triples, queries=None, collection=None):
     else:
         raise NotImplementedError()
 
+    print("Using config.checkpoint =", config.checkpoint)
     if not config.reranker:
         colbert = ColBERT(name=config.checkpoint, colbert_config=config)
     else:
@@ -78,11 +109,10 @@ def train(config: ColBERTConfig, triples, queries=None, collection=None):
 
     start_batch_idx = 0
 
-    # if config.resume:
-    #     assert config.checkpoint is not None
-    #     start_batch_idx = checkpoint['batch']
-
-    #     reader.skip_to_batch(start_batch_idx, checkpoint['arguments']['bsize'])
+    if config.resume:
+        assert config.checkpoint is not None
+        start_batch_idx = checkpoint['batch']
+        reader.skip_to_batch(start_batch_idx, 64)
 
     for batch_idx, BatchSteps in zip(range(start_batch_idx, config.maxsteps), reader):
         if (warmup_bert is not None) and warmup_bert <= batch_idx:
@@ -90,6 +120,7 @@ def train(config: ColBERTConfig, triples, queries=None, collection=None):
             warmup_bert = None
 
         this_batch_loss = 0.0
+        l1_penality_sum = 0
 
         for batch in BatchSteps:
             with amp.context():
@@ -123,7 +154,17 @@ def train(config: ColBERTConfig, triples, queries=None, collection=None):
 
                     loss += ib_loss
 
+
                 loss = loss / config.accumsteps
+
+            # apply l1 regularization
+            if prune_l1_lambda > 0:
+                l1_norm = np.mean([p.abs().sum().cpu().detach().numpy() 
+                    for name, p in colbert.named_parameters() 
+                    if not filter_layers(name, prune_type)])
+                l1_penality = prune_l1_lambda * l1_norm
+                l1_penality_sum += l1_penality
+                loss += l1_penality
 
             if config.rank < 1:
                 print_progress(scores)
@@ -137,14 +178,19 @@ def train(config: ColBERTConfig, triples, queries=None, collection=None):
 
         amp.step(colbert, optimizer, scheduler)
 
+        ckpt_loss = {'training_loss': train_loss,
+                    'l1_penality': l1_penality_sum,
+                    'colbert_loss':train_loss-l1_penality_sum}
         if config.rank < 1:
-            print_message(batch_idx, train_loss)
-            manage_checkpoints(config, colbert, optimizer, batch_idx+1, savepath=None)
+            if l1_penality_sum > 0:
+                print_message(batch_idx, train_loss-l1_penality_sum, l1_penality_sum)
+            else:
+                print_message(batch_idx, train_loss)
+            manage_checkpoints(config, colbert, optimizer, batch_idx+1, savepath=None, save_extra_param=ckpt_loss)
 
     if config.rank < 1:
         print_message("#> Done with all triples!")
-        ckpt_path = manage_checkpoints(config, colbert, optimizer, batch_idx+1, savepath=None, consumed_all_triples=True)
-
+        ckpt_path = manage_checkpoints(config, colbert, optimizer, batch_idx+1, savepath=None, consumed_all_triples=True, save_extra_param=ckpt_loss)
         return ckpt_path  # TODO: This should validate and return the best checkpoint, not just the last one.
     
 

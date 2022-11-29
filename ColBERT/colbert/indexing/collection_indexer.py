@@ -77,7 +77,7 @@ class CollectionIndexer():
             if self._try_load_plan():
                 Run().print_main(f"#> Loaded plan from {self.plan_path}:")
                 Run().print_main(f"#> num_chunks = {self.num_chunks}")
-                Run().print_main(f"#> num_partitions = {self.num_chunks}")
+                Run().print_main(f"#> num_partitions = {self.num_partitions}")
                 Run().print_main(f"#> num_embeddings_est = {self.num_embeddings_est}")
                 Run().print_main(f"#> avg_doclen_est = {self.avg_doclen_est}")
                 # added for resume

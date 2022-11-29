@@ -128,7 +128,10 @@ class IndexScorer(IndexLoader, CandidateGeneration):
                 approx_scores.append(approx_scores_)
             approx_scores = torch.cat(approx_scores, dim=0)
             if config.ndocs < len(approx_scores):
-                pids = pids[torch.topk(approx_scores, k=config.ndocs).indices]
+                try:
+                    pids = pids[torch.topk(approx_scores, k=config.ndocs).indices]
+                except:
+                    pids = pids[torch.topk(approx_scores.cuda().float(), k=config.ndocs).indices]
 
             # Filter docs using full centroid scores
             codes_packed, codes_lengths = self.embeddings_strided.lookup_codes(pids)
@@ -137,7 +140,10 @@ class IndexScorer(IndexLoader, CandidateGeneration):
             approx_scores_padded, approx_scores_mask = approx_scores_strided.as_padded_tensor()
             approx_scores = colbert_score_reduce(approx_scores_padded, approx_scores_mask, config)
             if config.ndocs // 4 < len(approx_scores):
-                pids = pids[torch.topk(approx_scores, k=(config.ndocs // 4)).indices]
+                try:
+                    pids = pids[torch.topk(approx_scores, k=(config.ndocs // 4)).indices]
+                except:
+                    pids = pids[torch.topk(approx_scores.cuda().float(), k=(config.ndocs // 4)).indices]
         else:
             pids = IndexScorer.filter_pids(
                     pids, centroid_scores, self.embeddings.codes, self.doclens,
