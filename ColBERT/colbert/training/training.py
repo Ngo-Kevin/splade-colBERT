@@ -42,7 +42,7 @@ def train(config: ColBERTConfig, triples, queries=None, collection=None):
     ### pruning
     ###### Gotta do full intergration w/ colBERT?
     prune_type = 'attention'
-    prune_l1_lambda = 5e-3
+    prune_l1_lambda = 0
     ###
 
     ### resume ###
@@ -159,11 +159,11 @@ def train(config: ColBERTConfig, triples, queries=None, collection=None):
 
             # apply l1 regularization
             if prune_l1_lambda > 0:
-                l1_norm = np.mean([p.abs().sum().cpu().detach().numpy() 
-                    for name, p in colbert.named_parameters() 
-                    if not filter_layers(name, prune_type)])
+                l1_norm = torch.cat([p.abs().sum().view(-1) 
+                   for name, p in colbert.named_parameters() 
+                    if not filter_layers(name, prune_type)]).mean()
                 l1_penality = prune_l1_lambda * l1_norm
-                l1_penality_sum += l1_penality
+                l1_penality_sum += l1_penality.item()
                 loss += l1_penality
 
             if config.rank < 1:
