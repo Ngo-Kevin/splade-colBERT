@@ -1,5 +1,6 @@
 import os
 import torch
+import ujson
 
 # from colbert.utils.runs import Run
 from colbert.utils.utils import print_message, save_checkpoint
@@ -12,7 +13,7 @@ def print_progress(scores):
     print("#>>>   ", positive_avg, negative_avg, '\t\t|\t\t', positive_avg - negative_avg)
 
 
-def manage_checkpoints(args, colbert, optimizer, batch_idx, savepath=None, consumed_all_triples=False):
+def manage_checkpoints(args, colbert, optimizer, batch_idx, savepath=None, consumed_all_triples=False, save_extra_param=None):
     # arguments = dict(args)
 
     # TODO: Call provenance() on the values that support it??
@@ -43,13 +44,16 @@ def manage_checkpoints(args, colbert, optimizer, batch_idx, savepath=None, consu
     if path_save:
         print(f"#> Saving a checkpoint to {path_save} ..")
 
-        checkpoint = {}
+        checkpoint = save_extra_param
         checkpoint['batch'] = batch_idx
         # checkpoint['epoch'] = 0
         # checkpoint['model_state_dict'] = model.state_dict()
         # checkpoint['optimizer_state_dict'] = optimizer.state_dict()
         # checkpoint['arguments'] = arguments
-
         save(path_save)
+        with open(os.path.join(path_save, "extra_info.json"), 'w+') as f:
+            ujson.dump(checkpoint, f, indent=4)
+            f.write('\n')
+
 
     return path_save
